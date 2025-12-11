@@ -42,6 +42,9 @@ macro_rules! pref {
     ("layout.css.font-variations.enabled") => {
         true
     };
+    ("layout.css.at-scope.enabled") => {
+        true
+    };
     ($string:literal) => {
         false
     };
