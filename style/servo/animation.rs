@@ -33,7 +33,6 @@ use crate::Atom;
 use parking_lot::RwLock;
 use rustc_hash::FxHashMap;
 use servo_arc::Arc;
-use std::fmt;
 
 /// Represents an animation for a given property.
 #[derive(Clone, Debug, MallocSizeOf)]
@@ -255,7 +254,7 @@ impl IntermediateComputedKeyframe {
 }
 
 /// A single computed keyframe for a CSS Animation.
-#[derive(Clone, MallocSizeOf)]
+#[derive(Clone, Debug, MallocSizeOf)]
 struct ComputedKeyframe {
     /// The timing function to use for transitions between this step
     /// and the next one.
@@ -350,7 +349,7 @@ impl ComputedKeyframe {
 }
 
 /// A CSS Animation
-#[derive(Clone, MallocSizeOf)]
+#[derive(Clone, Debug, MallocSizeOf)]
 pub struct Animation {
     /// The name of this animation as defined by the style.
     pub name: Atom,
@@ -385,11 +384,6 @@ pub struct Animation {
 
     /// The current animation direction. This can only be `normal` or `reverse`.
     pub current_direction: AnimationDirection,
-
-    /// The original cascade style, needed to compute the generated keyframes of
-    /// the animation.
-    #[ignore_malloc_size_of = "ComputedValues"]
-    pub cascade_style: Arc<ComputedValues>,
 
     /// Whether or not this animation is new and or has already been tracked
     /// by the script thread.
@@ -692,22 +686,6 @@ impl Animation {
             let value = animation.calculate_value(progress_between_keyframes);
             map.insert(value.id().to_owned(), value);
         }
-    }
-}
-
-impl fmt::Debug for Animation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("Animation")
-            .field("name", &self.name)
-            .field("started_at", &self.started_at)
-            .field("duration", &self.duration)
-            .field("delay", &self.delay)
-            .field("iteration_state", &self.iteration_state)
-            .field("state", &self.state)
-            .field("direction", &self.direction)
-            .field("current_direction", &self.current_direction)
-            .field("cascade_style", &())
-            .finish()
     }
 }
 
@@ -1563,7 +1541,6 @@ pub fn maybe_start_animations<E>(
             state,
             direction: animation_direction,
             current_direction: initial_direction,
-            cascade_style: new_style.clone(),
             is_new: true,
         };
 
