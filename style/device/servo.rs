@@ -12,7 +12,7 @@ use crate::logical_geometry::WritingMode;
 use crate::media_queries::MediaType;
 use crate::properties::style_structs::Font;
 use crate::properties::ComputedValues;
-use crate::queries::values::PrefersColorScheme;
+use crate::queries::values::{PrefersColorScheme, Scripting};
 use crate::values::computed::font::GenericFontFamily;
 use crate::values::computed::{CSSPixelLength, Length, LineHeight, NonNegativeLength};
 use crate::values::specified::color::{ColorSchemeFlags, ForcedColors, SystemColor};
@@ -67,6 +67,8 @@ pub(super) struct ExtraDeviceData {
     /// An implementation of a trait which implements support for querying font metrics.
     #[ignore_malloc_size_of = "Owned by embedder"]
     font_metrics_provider: Box<dyn FontMetricsProvider>,
+    /// Whether scripting is enabled.
+    scripting: Scripting,
 }
 
 impl Device {
@@ -79,6 +81,7 @@ impl Device {
         font_metrics_provider: Box<dyn FontMetricsProvider>,
         default_values: Arc<ComputedValues>,
         prefers_color_scheme: PrefersColorScheme,
+        scripting: Scripting,
     ) -> Device {
         let root_style = RwLock::new(Arc::clone(&default_values));
         Device {
@@ -105,6 +108,7 @@ impl Device {
                 quirks_mode,
                 prefers_color_scheme,
                 font_metrics_provider,
+                scripting
             },
         }
     }
@@ -262,6 +266,11 @@ impl Device {
     /// Returns the color scheme of this [`Device`].
     pub fn color_scheme(&self) -> PrefersColorScheme {
         self.extra.prefers_color_scheme
+    }
+
+    /// Returns whether scripting is enabled for this [`Device`].
+    pub fn scripting(&self) -> Scripting {
+        self.extra.scripting
     }
 
     pub(crate) fn is_dark_color_scheme(&self, _: ColorSchemeFlags) -> bool {

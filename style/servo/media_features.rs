@@ -6,7 +6,7 @@
 
 use crate::derives::*;
 use crate::queries::feature::{AllowsRanges, Evaluator, FeatureFlags, QueryFeatureDescription};
-use crate::queries::values::PrefersColorScheme;
+use crate::queries::values::{PrefersColorScheme, Scripting};
 use crate::values::computed::{CSSPixelLength, Context, Resolution};
 use std::fmt::Debug;
 
@@ -46,8 +46,18 @@ fn eval_prefers_color_scheme(context: &Context, query_value: Option<PrefersColor
     }
 }
 
+fn eval_scripting(context: &Context, scripting_query: Option<Scripting>) -> bool {
+    let device_scripting = context.device().scripting();
+
+    let Some(scripting_query) = scripting_query else {
+        return device_scripting != Scripting::None;
+    };
+
+    device_scripting == scripting_query
+}
+
 /// A list with all the media features that Servo supports.
-pub static MEDIA_FEATURES: [QueryFeatureDescription; 6] = [
+pub static MEDIA_FEATURES: [QueryFeatureDescription; 7] = [
     feature!(
         atom!("width"),
         AllowsRanges::Yes,
@@ -82,6 +92,13 @@ pub static MEDIA_FEATURES: [QueryFeatureDescription; 6] = [
         atom!("prefers-color-scheme"),
         AllowsRanges::No,
         keyword_evaluator!(eval_prefers_color_scheme, PrefersColorScheme),
+        FeatureFlags::empty(),
+    ),
+    // https://drafts.csswg.org/mediaqueries-5/#scripting
+    feature!(
+        atom!("scripting"),
+        AllowsRanges::No,
+        keyword_evaluator!(eval_scripting, Scripting),
         FeatureFlags::empty(),
     ),
 ];

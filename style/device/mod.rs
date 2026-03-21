@@ -95,7 +95,6 @@ pub struct Device {
     /// <https://quirks.spec.whatwg.org/#the-tables-inherit-color-from-body-quirk>
     #[cfg_attr(feature = "servo", ignore_malloc_size_of = "Pure stack type")]
     body_text_color: AtomicU32,
-
     /// Extra Gecko-specific or Servo-specific data.
     extra: ExtraDeviceData,
 }

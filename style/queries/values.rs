@@ -44,3 +44,22 @@ pub enum PrefersColorScheme {
     Light,
     Dark,
 }
+
+/// Values for the `scripting` media feature.
+///
+/// <https://drafts.csswg.org/mediaqueries-5/#scripting>
+#[derive(Clone, Copy, Debug, FromPrimitive, Parse, PartialEq, ToCss)]
+#[cfg_attr(feature = "servo", derive(MallocSizeOf))]
+#[repr(u8)]
+pub enum Scripting {
+    /// Scripting is not supported or not enabled.
+    None,
+    /// Scripting is supported and enabled, but only for initial page load.
+    ///
+    /// We will never match this value as it is intended for non-browser user agents,
+    /// but it is part of the spec so we should still parse it.
+    /// See: https://github.com/w3c/csswg-drafts/issues/8621
+    InitialOnly,
+    /// Scripting is supported and enabled.
+    Enabled,
+}

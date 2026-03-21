@@ -10,7 +10,7 @@ use crate::gecko_bindings::structs;
 use crate::media_queries::{Device, MediaType};
 use crate::parser::ParserContext;
 use crate::queries::feature::{AllowsRanges, Evaluator, FeatureFlags, QueryFeatureDescription};
-use crate::queries::values::{Orientation, PrefersColorScheme};
+use crate::queries::values::{Orientation, PrefersColorScheme, Scripting};
 use crate::values::computed::{CSSPixelLength, Context, Ratio, Resolution};
 use crate::values::specified::color::ForcedColors;
 use app_units::Au;
@@ -587,22 +587,6 @@ fn eval_gtk_theme_family(_: &Context, query_value: Option<GtkThemeFamily>) -> bo
         Some(v) => v == family,
         None => return family != GtkThemeFamily::Unknown,
     }
-}
-
-/// Values for the scripting media feature.
-/// https://drafts.csswg.org/mediaqueries-5/#scripting
-#[derive(Clone, Copy, Debug, FromPrimitive, Parse, PartialEq, ToCss)]
-#[repr(u8)]
-pub enum Scripting {
-    /// Scripting is not supported or not enabled
-    None,
-    /// Scripting is supported and enabled, but only for initial page load
-    /// We will never match this value as it is intended for non-browser user agents,
-    /// but it is part of the spec so we should still parse it.
-    /// See: https://github.com/w3c/csswg-drafts/issues/8621
-    InitialOnly,
-    /// Scripting is supported and enabled
-    Enabled,
 }
 
 /// https://drafts.csswg.org/mediaqueries-5/#scripting
